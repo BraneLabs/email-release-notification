@@ -1,9 +1,9 @@
 const fs           = require('fs');
 const axios        = require('axios');
 const showdown     = require('showdown');
-const sendgridMail = require('@sendgrid/mail');
+const sendgridMail = require('@mailgun-js');
 
-const setCredentials = () => sendgridMail.setApiKey(process.env.SENDGRID_API_TOKEN);
+const mailgun = new Mailgun({apiKey: process.env.MAILGUN_API_TOKEN, domain: process.env.MAILGUN_EMAIL_DOMAIN});
 
 async function prepareMessage(recipients, lists) {
   const { repository, release } = JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
@@ -16,26 +16,21 @@ async function prepareMessage(recipients, lists) {
   const releaseName = release.name;
   const releaseURL = release.html_url;
   const ownerResponse = await axios.get(repository.owner.url);
-  const ownerName = ownerResponse.data.name;
 
   // Templates
-  const subject = `[ANN] ${repoName} ${releaseVersion} [${releaseName}] released!`;
-  const footer = `\n\nRegards,\n\nThe ${ownerName} team`;
+  const subject = `[GitHub] ${repoName} ${releaseVersion} [${releaseName}] released!`;
+  const footer = `\n\nRegards,\n\nThe Engineering team`;
   const header = `[${repoName}](${repoURL})${repoDescription} reached it's [${releaseVersion}](${releaseURL}) version.`;
 
   const releaseBody = converter.makeHtml(`${header}\n\n${release.body}${footer}`);
 
-  const sender = process.env.SENDER_EMAIL;
+  const sender = process.env.RELEASE_SENDER_EMAIL;
 
   return {
-    from: {
-      name: ownerName,
-      email: sender,
-    },
-    to: sender,
-    cc: lists,
+    from: sender,
+    to: lists,
     bcc: recipients,
-    subject,
+    subject: subject,
     html: releaseBody,
   };
 }
@@ -44,15 +39,22 @@ async function run(recipientsUrl, distributionLists) {
   const recipients = data.split(/\r\n|\n|\r/);
   const lists = distributionLists ? distributionLists.split(',') : [];
   const message = await prepareMessage(recipients, lists);
-  await sendgridMail.send(message);
-  console.log('Mail sent!');
+  await mailgun.messages().send(message, function (err, body) {
+        if (err) {
+            console.error(err);
+        }
+        else {
+            console.log("Sent!")
+            console.log(body);
+        }
+    });
 }
 
 /**
  * Run
  */
 setCredentials();
-run(process.env.RECIPIENTS_URL, process.env.DISTRIBUTION_LISTS)
+run(process.env.RELEASE_RECIPIENTS_URL, process.env.RELEASE_DISTRIBUTION_LISTS)
   .catch((error) => {
     console.error(error);
     process.exit(1);
