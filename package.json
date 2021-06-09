@@ -1,7 +1,7 @@
 {
   "name": "email-release-notification",
   "version": "3.0.1",
-  "description": "SendGrid GitHub Notify Action",
+  "description": "MailGun GitHub Notify Action",
   "contributors": [
     {
       "name": "Buenos Aires Smalltalk",
@@ -22,8 +22,8 @@
     "start": "node src/notify.js"
   },
   "dependencies": {
-    "@sendgrid/mail": "^6.5.4",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
+    "mailgun-js": "^0.6.7",
     "showdown": "^1.9.1"
   },
   "devDependencies": {
