@@ -2,14 +2,16 @@
   "name": "email-release-notification",
   "version": "3.0.1",
   "description": "SendGrid GitHub Notify Action",
-  "contributors": [{
-    "name": "Buenos Aires Smalltalk",
-    "url": "https://github.com/ba-st"
+  "contributors": [
+    {
+      "name": "Buenos Aires Smalltalk",
+      "url": "https://github.com/ba-st"
     },
     {
-    "name": "Daniel Naves de Carvalho",
-    "url": "https://github.com/BraneLabs"
-  }],
+      "name": "Daniel Naves de Carvalho",
+      "url": "https://github.com/BraneLabs"
+    }
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
