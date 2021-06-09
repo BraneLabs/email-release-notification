@@ -1,15 +1,19 @@
 {
   "name": "email-release-notification",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "SendGrid GitHub Notify Action",
-  "author": {
+  "contributors": [{
     "name": "Buenos Aires Smalltalk",
     "url": "https://github.com/ba-st"
-  },
+    },
+    {
+    "name": "Daniel Naves de Carvalho",
+    "url": "https://github.com/BraneLabs"
+  }],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ba-st-actions/email-release-notification"
+    "url": "https://github.com/BraneLabs/email-release-notification"
   },
   "scripts": {
     "lint": "eslint src/**/*.js",
