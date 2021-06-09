@@ -1,6 +1,6 @@
 {
   "name": "email-release-notification",
-  "version": "3.0.1",
+  "version": "4.0.0",
   "description": "MailGun GitHub Notify Action",
   "contributors": [
     {

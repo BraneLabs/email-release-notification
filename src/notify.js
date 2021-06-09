@@ -1,9 +1,7 @@
 const fs           = require('fs');
 const axios        = require('axios');
 const showdown     = require('showdown');
-const Mailgun      = require('mailgun.js');
-
-const mailgun = new Mailgun({apiKey: process.env.MAILGUN_API_TOKEN, domain: process.env.MAILGUN_EMAIL_DOMAIN});
+const Mailgun      = require('mailgun-js');
 
 async function prepareMessage(recipients, lists) {
   const { repository, release } = JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
@@ -27,11 +25,11 @@ async function prepareMessage(recipients, lists) {
 
   const sender = process.env.RELEASE_SENDER_EMAIL;
 
-   if (releaseRegex == null || new RegExp(releaseRegex).match(releaseVersion) != null) {
+   if (releaseRegex == null || new RegExp(releaseRegex).test(releaseVersion) != null) {
     return {
       from: sender,
-      to: lists,
-      bcc: recipients,
+      to: recipients,
+      bcc: lists,
       subject: subject,
       html: releaseBody,
     };
@@ -43,6 +41,9 @@ async function run(recipientsUrl, distributionLists) {
   const { data } = await axios.get(recipientsUrl);
   const recipients = data.split(/\r\n|\n|\r/);
   const lists = distributionLists ? distributionLists.split(',') : [];
+
+  const mailgun = new Mailgun({apiKey: process.env.MAILGUN_API_TOKEN, domain: process.env.MAILGUN_EMAIL_DOMAIN});
+
   const message = await prepareMessage(recipients, lists);
   if(message != false) {
     await mailgun.messages().send(message, function (err, body) {
@@ -60,7 +61,6 @@ async function run(recipientsUrl, distributionLists) {
 /**
  * Run
  */
-setCredentials();
 run(process.env.RELEASE_RECIPIENTS_URL, process.env.RELEASE_DISTRIBUTION_LISTS)
   .catch((error) => {
     console.error(error);
