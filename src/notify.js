@@ -1,7 +1,7 @@
 const fs           = require('fs');
 const axios        = require('axios');
 const showdown     = require('showdown');
-const sendgridMail = require('@mailgun-js');
+const Mailgun      = require('mailgun.js');
 
 const mailgun = new Mailgun({apiKey: process.env.MAILGUN_API_TOKEN, domain: process.env.MAILGUN_EMAIL_DOMAIN});
 
