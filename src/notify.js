@@ -6,7 +6,7 @@ const Mailgun      = require('mailgun-js');
 async function prepareMessage(recipients, lists) {
   const { repository, release } = JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
 
-  const converter = new showdown.Converter();
+  const converter = new showdown.Converter({simpleLineBreaks: true});
   const repoName = repository.name;
   const repoURL = repository.html_url;
   const repoDescription = repository.description ? `, ${repository.description.charAt(0).toLowerCase()+repository.description.slice(1)}` : '';
@@ -25,7 +25,13 @@ async function prepareMessage(recipients, lists) {
 
   const sender = process.env.RELEASE_SENDER_EMAIL;
 
-   if (releaseRegex == null || new RegExp(releaseRegex).test(releaseVersion) != null) {
+  console.log("Regex: " + releaseRegex);
+  console.log("ReleaseVersion: " + releaseVersion);
+  if (releaseRegex != null) {
+    console.log("Match?: " + new RegExp(releaseRegex).test(releaseVersion));
+  }
+
+  if (releaseRegex == null || new RegExp(releaseRegex).test(releaseVersion)) {
     return {
       from: sender,
       to: recipients,
@@ -33,10 +39,11 @@ async function prepareMessage(recipients, lists) {
       subject: subject,
       html: releaseBody,
     };
-   } else {
-     return false;
-   }
+  } else {
+    return false;
+  }
 }
+
 async function run(recipientsUrl, distributionLists) {
   const { data } = await axios.get(recipientsUrl);
   const recipients = data.split(/\r\n|\n|\r/);
@@ -53,6 +60,7 @@ async function run(recipientsUrl, distributionLists) {
           else {
               console.log("Sent!")
               console.log(body);
+              console.log(message);
           }
       });
   }
